@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UM Trivia Game</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background: #E6F4E6; padding: 20px; color: #005030; }
+        .quiz-container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); max-width: 500px; margin: auto; border: 4px solid #F47321; }
+        
+        .title {
+            font-size: 32px; 
+            font-weight: bold; 
+            text-transform: uppercase;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            margin-bottom: 10px;
+        }
+        .title .um { color: #005030; }   
+        .title .trivia { color: #F47321; } 
+        .question { font-size: 18px; font-weight: bold; margin-bottom: 15px; }
+        button { width: 100%; padding: 10px; margin: 5px 0; font-size: 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; }
+        .option { background: #F47321; color: white; } .option:hover { background: #D65E1A; }
+        #next-btn { background: #005030; color: white; display: none; margin-top: 15px; }
+        #feedback { font-size: 22px; font-weight: bold; margin-top: 10px; }
+        #score { font-size: 18px; font-weight: bold; margin-top: 15px; }
+    </style>
+</head>
+<body>
+    <h1 class="title"><span class="um">University of Miami</span> <span class="trivia">Trivia</span></h1>
+    <div class="quiz-container">
+        <p id="question" class="question"></p>
+        <div id="options"></div>
+        <p id="feedback"></p>
+        <button id="next-btn" onclick="nextQuestion()">Next Question</button>
+        <p id="score">Score: 0 / 10</p>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "What year was UM founded?", a: ["1925", "1901", "1930", "1915"], c: "1925" },
+            { q: "UM's official mascot?", a: ["Sebastian the Ibis", "Tommy the Turtle", "Hurricane Harry", "Billy the Bird"], c: "Sebastian the Ibis" },
+            { q: "UM's athletic conference?", a: ["SEC", "Big Ten", "ACC", "Pac-12"], c: "ACC" },
+            { q: "UM's school colors?", a: ["Green and Orange", "Blue and Gold", "Red and White", "Purple and Yellow"], c: "Green and Orange" },
+            { q: "UM's sports team nickname?", a: ["The Hurricanes", "The Panthers", "The Gators", "The Knights"], c: "The Hurricanes" },
+            { q: "Where is UM's main campus?", a: ["Coral Gables, FL", "Orlando, FL", "Miami Beach, FL", "Tampa, FL"], c: "Coral Gables, FL" },
+            { q: "UM's student newspaper?", a: ["The Miami Hurricane", "The UM Times", "Hurricane Daily", "The Miami Gazette"], c: "The Miami Hurricane" },
+            { q: "Which NFL star went to UM?", a: ["Ray Lewis", "Tom Brady", "Peyton Manning", "Aaron Rodgers"], c: "Ray Lewis" },
+            { q: "UM's business school name?", a: ["Miami Business School", "Patti and Allan Herbert Business School", "Coral Gables Business College", "Hurricane Business Institute"], c: "Patti and Allan Herbert Business School" },
+            { q: "What lake is on UM's campus?", a: ["Lake Osceola", "Miami Bay", "Everglades River", "Hurricane Lagoon"], c: "Lake Osceola" }
+        ];
+
+        let index = 0, score = 0;
+        const qEl = document.getElementById("question"), oEl = document.getElementById("options"), fEl = document.getElementById("feedback"), sEl = document.getElementById("score"), nextBtn = document.getElementById("next-btn");
+
+        function loadQuestion() {
+            fEl.textContent = ""; nextBtn.style.display = "none"; oEl.innerHTML = "";
+            qEl.textContent = questions[index].q;
+            questions[index].a.forEach(option => {
+                let btn = document.createElement("button");
+                btn.textContent = option; btn.classList.add("option");
+                btn.onclick = () => checkAnswer(option, btn);
+                oEl.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(answer, btn) {
+            if (answer === questions[index].c) {
+                score++; fEl.textContent = "✔ Correct!"; fEl.style.color = "green";
+            } else {
+                fEl.textContent = "❌ Incorrect!"; fEl.style.color = "red";
+            }
+            nextBtn.style.display = "block";
+            sEl.textContent = `Score: ${score} / 10`;
+        }
+
+        function nextQuestion() {
+            if (++index < questions.length) loadQuestion();
+            else endGame();
+        }
+
+        function endGame() {
+            qEl.textContent = "Quiz Completed!";
+            oEl.innerHTML = ""; fEl.textContent = `Final Score: ${score} / 10`; fEl.style.color = "#005030";
+            nextBtn.style.display = "none";
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>
