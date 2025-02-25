@@ -2,108 +2,177 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UM Trivia Game</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; background: #E6F4E6; padding: 20px; color: #005030; }
-        .quiz-container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); max-width: 600px; margin: auto; border: 4px solid #F47321; }
-        
-        .title {
-            font-size: 36px; 
-            font-weight: bold; 
-            text-transform: uppercase;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-            margin-bottom: 15px;
+        body {
+            font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+            color: black; /* Default text color set to black */
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #fff;
+            overflow: hidden;
+            position: relative;
         }
-        .title .um { color: #005030; }   
-        .title .trivia { color: #F47321; } 
-        .question { font-size: 22px; font-weight: bold; margin-bottom: 20px; }
-        button { width: 100%; padding: 12px; margin: 6px 0; font-size: 18px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; }
-        .option { background: #F47321; color: white; } .option:hover { background: #D65E1A; }
-        #next-btn, #restart-btn { background: #005030; color: white; display: none; margin-top: 20px; }
-        #feedback { font-size: 24px; font-weight: bold; margin-top: 15px; }
-        #score, #progress { font-size: 18px; font-weight: bold; margin-top: 15px; }
+    
+        body::before,
+        body::after {
+            content: "";
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            opacity: 0.2;
+            z-index: 0;
+        }
+    
+        body::before {
+            background: #F47321;
+            top: -100px;
+            left: -100px;
+        }
+    
+        body::after {
+            background: #005030;
+            bottom: -100px;
+            right: -100px;
+        }
+    
+        .quiz-container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            width: 480px;
+            border-top: 5px solid #F47321;
+            border-bottom: 5px solid #005030;
+            z-index: 1;
+            color: black; /* Ensures container text is black */
+        }
+    
+        .title {
+            font-size: 26px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+    
+        .title .um { color: #065d3a; }
+        .title .trivia { color: #df712d; }
+    
+        .question {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: black;
+        }
+    
+        button {
+            padding: 10px;
+            width: 100%;
+            border-radius: 8px;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-bottom: 10px;
+            color: black;
+        }
+    
+        .option {
+            background: #FFB085; 
+            color: black;
+        }
+    
+        .option:hover {
+            background: #F47321;
+            color: white;
+        }
+    
+        #next-btn, #restart-btn {
+            background: #8DC9A9; 
+            color: black;
+            margin-top: 15px;
+            display: none;
+        }
+    
+        #next-btn:hover, #restart-btn:hover {
+            background: #005030;
+            color: white;
+        }
+    
+        #progress, #score, #feedback {
+            font-weight: bold; 
+            margin-top: 15px;
+            color: black;
+        }
     </style>
 </head>
 <body>
-    <h1 class="title"><span class="um">University of Miami</span> <span class="trivia">Trivia</span></h1>
     <div class="quiz-container">
-        <p id="progress"></p> <!-- Progress Tracker -->
+        <h1 class="title"><span class="um">UNIVERSITY OF MIAMI</span> <span class="trivia">TRIVIA</span></h1>
+        <p id="progress"></p>
         <p id="question" class="question"></p>
         <div id="options"></div>
         <p id="feedback"></p>
         <button id="next-btn" onclick="nextQuestion()">Next Question</button>
-        <p id="score">Score: 0 / 10</p>
-        <button id="restart-btn" onclick="restartGame()" style="display: none;">Restart Quiz</button> <!-- Hidden initially -->
+        <p id="score">Score: 0 </p>
+        <button id="restart-btn" onclick="restartGame()">Restart Quiz</button>
     </div>
 
     <script>
         const questions = [
-            { q: "What year was UM founded?", a: ["1925", "1901", "1930", "1915"], c: "1925" },
-            { q: "UM's official mascot?", a: ["Sebastian the Ibis", "Tommy the Turtle", "Hurricane Harry", "Billy the Bird"], c: "Sebastian the Ibis" },
-            { q: "UM's athletic conference?", a: ["SEC", "Big Ten", "ACC", "Pac-12"], c: "ACC" },
-            { q: "UM's school colors?", a: ["Green and Orange", "Blue and Gold", "Red and White", "Purple and Yellow"], c: "Green and Orange" },
-            { q: "UM's sports team nickname?", a: ["The Hurricanes", "The Panthers", "The Gators", "The Knights"], c: "The Hurricanes" },
-            { q: "Where is UM's main campus?", a: ["Coral Gables, FL", "Orlando, FL", "Miami Beach, FL", "Tampa, FL"], c: "Coral Gables, FL" },
-            { q: "UM's student newspaper?", a: ["The Miami Hurricane", "The UM Times", "Hurricane Daily", "The Miami Gazette"], c: "The Miami Hurricane" },
-            { q: "Which NFL star went to UM?", a: ["Ray Lewis", "Tom Brady", "Peyton Manning", "Aaron Rodgers"], c: "Ray Lewis" },
-            { q: "UM's business school name?", a: ["Miami Business School", "Patti and Allan Herbert Business School", "Coral Gables Business College", "Hurricane Business Institute"], c: "Patti and Allan Herbert Business School" },
-            { q: "What lake is on UM's campus?", a: ["Lake Osceola", "Miami Bay", "Everglades River", "Hurricane Lagoon"], c: "Lake Osceola" }
+            { q:"What year UM was founded?",a:["1925","1901","1930","1915"],c:"1925"},
+            { q:"Who is UM's official mascot?",a:["Tommy the Turtle","Barry the Bulldog","Sebastian the Ibis","Link the Leapord"],c:"Sebastian the Ibis"},
+            { q:"What is UM's Athletic conference?",a:["SEC","Big Ten","ACC","Pac-12"],c:"ACC"},
+            { q:"What are UM's colors?",a:["Blue and Red","Green and Orange","Red and Brown","Purple and Yellow"],c:"Green and Orange"},
+            { q:"What are UM students called?",a:["Hurricanes","Flamingos","Gators","Rats"],c:"Hurricanes"},
+            { q:"Where is UM's main campus?",a:["Coconut Grove","Miami Beach","Coral Gables","Brickell"],c:"Coral Gables"},
+            { q:"What is the UM newspaper called?",a:["Miami Hurricane","UM Times","Daily Hurricane","Miami Gazette"],c:"The Miami Hurricane"},
+            { q:"What NFL star is from UM?",a:["Ray Lewis","Tom Brady","Eli Manning","Patrick Mahomes"],c:"Ray Lewis"},
+            { q:"What is UM's business school named?",a:["Miami Business","Miami Herbert Business School","Gables College","Hurricane Institute"],c:"Miami Herbert Business School"},
+            { q:"What is the name of the lake on UM's campus?",a:["Miami Bay","Everglades","Hurricane Lagoon","Lake Osceola"],c:"Lake Osceola"}
         ];
 
-        let index = 0, score = 0;
-        const qEl = document.getElementById("question"), oEl = document.getElementById("options"), fEl = document.getElementById("feedback"), sEl = document.getElementById("score"), nextBtn = document.getElementById("next-btn"), restartBtn = document.getElementById("restart-btn"), progressEl = document.getElementById("progress");
+        let index=0, score=0;
+        const qEl=document.getElementById("question"), oEl=document.getElementById("options"),fEl=document.getElementById("feedback"), sEl=document.getElementById("score"), nextBtn=document.getElementById("next-btn"),restartBtn=document.getElementById("restart-btn"),progressEl=document.getElementById("progress");
 
-        function loadQuestion() {
-            fEl.textContent = ""; nextBtn.style.display = "none"; oEl.innerHTML = "";
-            progressEl.textContent = `Question ${index + 1} of ${questions.length}`; // Update progress tracker
-            qEl.textContent = questions[index].q;
-            questions[index].a.forEach(option => {
-                let btn = document.createElement("button");
-                btn.textContent = option; btn.classList.add("option");
-                btn.onclick = () => checkAnswer(option, btn);
+        function loadQuestion(){
+            nextBtn.style.display="none";oEl.innerHTML="";fEl.textContent="";
+            progressEl.textContent=`Question ${index+1} of ${questions.length}`;
+            qEl.textContent=questions[index].q;
+            questions[index].a.forEach(option=>{
+                let btn=document.createElement("button");
+                btn.textContent=option;btn.className="option";
+                btn.onclick=()=>checkAnswer(option);
                 oEl.appendChild(btn);
             });
         }
 
-        function checkAnswer(answer, btn) {
-            if (answer === questions[index].c) {
-                score++; fEl.textContent = "✔ Correct!"; fEl.style.color = "green";
-            } else {
-                fEl.textContent = "❌ Incorrect!"; fEl.style.color = "red";
-            }
-            nextBtn.style.display = "block";
-            sEl.textContent = `Score: ${score} / 10`;
+        function checkAnswer(answer){
+            if(answer===questions[index].c){score++;fEl.textContent="✔ Correct!";fEl.style.color="#008000";}
+            else{fEl.textContent="❌ Incorrect!";fEl.style.color="#FF0000";}
+            nextBtn.style.display="block";sEl.textContent=`Score: ${score}`;
         }
 
-        function nextQuestion() {
-            if (++index < questions.length) {
-                loadQuestion();
-            } else {
-                endGame();
-            }
+        function nextQuestion(){
+            if(++index<questions.length)loadQuestion();
+            else endGame();
         }
 
-        function endGame() {
-            qEl.textContent = "Quiz Completed!";
-            oEl.innerHTML = ""; 
-            fEl.textContent = `Final Score: ${score} / 10`; 
-            fEl.style.color = "#005030";
-            nextBtn.style.display = "none";
-            sEl.style.display = "none"; // Hide score section
-            progressEl.style.display = "none"; // Hide progress tracker
-            restartBtn.style.display = "block"; // Show restart button at the end
+        function endGame(){
+            qEl.textContent="Quiz Completed!";oEl.innerHTML="";
+            fEl.textContent=`Final Score: ${score}/10`;
+            sEl.style.display="none";progressEl.style.display="none";
+            restartBtn.style.display="block";nextBtn.style.display="none";
         }
 
-        function restartGame() {
-            index = 0; score = 0;
-            sEl.textContent = `Score: 0 / 10`;
-            sEl.style.display = "block"; // Show score again
-            progressEl.style.display = "block"; // Show progress tracker again
-            restartBtn.style.display = "none"; // Hide restart button until the end
-            loadQuestion();
+        function restartGame(){
+            index=0;score=0;sEl.textContent=`Score: ${score}/10`;sEl.style.display="block";
+            progressEl.style.display="block";restartBtn.style.display="none";loadQuestion();
         }
-
         loadQuestion();
     </script>
 </body>
